@@ -19,8 +19,8 @@ class Node {
 
 public:
 	Node() {
-		items.reserve(KEY_MAX);
-		children.reserve(KEY_MAX+1);
+		items.reserve(KEY_MAX+1);
+		children.reserve(KEY_MAX+2);
 	}
 
 	Node* insert(Data& data, Node* parent=nullptr, int index=0) {
@@ -35,7 +35,7 @@ public:
 					goto FOR_END;
 				}
 				else {
-					children[i]->insert(data);
+					children[i]->insert(data, this, i);
 					goto FOR_END;
 				}
 			}
@@ -45,7 +45,7 @@ public:
 			items.push_back(new Container(data));
 		}
 		else {
-			children[KEY_MAX]->insert(data);
+			children[KEY_MAX]->insert(data, this, items.size());
 		}
 
 		FOR_END:;
@@ -61,15 +61,17 @@ public:
 			right->items.push_back(pop);
 			items.pop_back();
 		}
+		Container* splitter = items.back();
+		items.pop_back();
 
 		if (parent) {
-			parent->items.insert(parent->items.begin() + index, items[split_index]);
+			parent->items.insert(parent->items.begin() + index, splitter);
 			parent->children.insert(parent->children.begin() + index + 1, right);
 			return parent;
 		}
 		else {
 			Node* parent_node = new Node();
-			parent_node->items.push_back(items[split_index]);
+			parent_node->items.push_back(splitter);
 			parent_node->children.push_back(this);
 			parent_node->children.push_back(right);
 			return parent_node;
