@@ -27,7 +27,7 @@ public:
 		for (int i = 0; i < items.size(); i++) {
 			if (data == items[i]->data) {
 				items[i]->data++;
-				return;
+				return parent;
 			}
 			else if (data < items[i]->data) {
 				if (children.size() == 0) { // is a leaf node
@@ -45,7 +45,7 @@ public:
 			items.push_back(new Container(data));
 		}
 		else {
-			children[KEY_MAX]->insert(data, this, items.size());
+			children[items.size()]->insert(data, this, items.size());
 		}
 
 		FOR_END:;
