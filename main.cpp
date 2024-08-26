@@ -17,6 +17,10 @@ class Node {
 	std::vector<Container*> items;
 	std::vector<Node*> children;
 
+	void destroy(Container* container) {
+
+	}
+
 public:
 	Node() {
 		items.reserve(KEY_MAX+1);
@@ -27,7 +31,7 @@ public:
 		for (int i = 0; i < items.size(); i++) {
 			if (data == items[i]->data) {
 				items[i]->data++;
-				return parent;
+				return this;
 			}
 			else if (data < items[i]->data) {
 				if (children.size() == 0) { // is a leaf node
@@ -51,23 +55,29 @@ public:
 		FOR_END:;
 
 		if (items.size() <= KEY_MAX) {
-			return parent;
+			return this;
 		}
 
 		int split_index = items.size() / 2;
 		Node* right = new Node();
 		for (int i = split_index + 1; i < KEY_MAX; i++) {
-			Container* pop = items.back();
-			right->items.push_back(pop);
+			Container* pop_item = items.back();
+			Node* pop_child = children.back();
+			right->items.insert(right->items.begin(), pop_item);
+			right->children.insert(right->children.begin(), pop_child);
+
 			items.pop_back();
+			children.pop_back();
 		}
+		right->children.insert(right->children.begin(), children.back());
+		children.pop_back();
 		Container* splitter = items.back();
 		items.pop_back();
 
 		if (parent) {
 			parent->items.insert(parent->items.begin() + index, splitter);
 			parent->children.insert(parent->children.begin() + index + 1, right);
-			return parent;
+			return this;
 		}
 		else {
 			Node* parent_node = new Node();
@@ -75,6 +85,17 @@ public:
 			parent_node->children.push_back(this);
 			parent_node->children.push_back(right);
 			return parent_node;
+		}
+	}
+
+	void remove(Data& data) {
+		for (int i = 0; i < items.size(); i++) {
+			if (items[i]->data == data) {
+				items[i]->count--;
+				if (items[i]->count <= 0) {
+
+				}
+			}
 		}
 	}
 };
