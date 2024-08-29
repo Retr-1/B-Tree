@@ -17,6 +17,9 @@ class Node {
 	std::vector<Container*> items;
 	std::vector<Node*> children;
 
+	void split_node() {
+
+	}
 
 	void balance(Node* parent, int index) {
 		if (items.size() >= KEY_MIN) {
@@ -152,7 +155,7 @@ public:
 		}
 	}
 
-	void remove(Data& data, Node* parent, int index) {
+	void remove(Data& data, Node* parent=nullptr, int index=0) {
 		for (int i = 0; i < items.size(); i++) {
 			if (items[i]->data == data) {
 				items[i]->count--;
@@ -164,9 +167,11 @@ public:
 				return;
 			}
 			else if (data < items[i]->data) {
-				children[i]->remove(data, this, i);
-				balance(parent, index);
-				return;
+				if (i < children.size()) {
+					children[i]->remove(data, this, i);
+					balance(parent, index);
+					return;
+				}
 			}
 		}
 
@@ -180,30 +185,19 @@ public:
 
 template <unsigned KEY_MAX, typename Data>
 class BTree {
-	struct DataNode {
-		Data data;
-		int count = 0;
-	};
-
-	struct Node {
-		BTree* pointers[KEY_MAX];
-		DataNode values[KEY_MAX];
-	};
-
-	unsigned KEY_MIN = KEY_MAX / 2;
-
-
+	Node* head = new Node<KEY_MAX, Data>();
 public:
-	void insert() {
-
+	void insert(Data& data) {
+		head = head->insert(data);
 	}
 
 	void remove() {
-
+		head->remove(data);
 	}
 };
 
 
 int main() {
+
 	return 0;
 }
