@@ -17,66 +17,72 @@ class Node {
 	std::vector<Container*> items;
 	std::vector<Node*> children;
 
-	void destroy(Container* container) {
-
-	}
 
 	void balance(Node* parent, int index) {
 		if (items.size() >= KEY_MIN) {
 			return;
 		}
 
-		if (children.size() == 0) {
-			// Stealing node from sibling
+		if (parent == nullptr) {
+			return;
+		}
 
-			if (index > 0) {
-				auto& left_sibling = parent->children[index - 1];
-				if (left_sibling->items.size() > KEY_MIN) {
-					auto& item = left_sibling->items.back();
-					std::swap(item, parent->items[index]);
-					items.insert(items.begin(), item);
-					return;
-				}
-			}
+		// Stealing node from sibling
 
-			if (index + 1 < parent->children.size()) {
-				auto& right_sibling = parent->children[index + 1];
-				if (right_sibling->items.size() > KEY_MIN) {
-					auto& item = right_sibling->items[0];
-					std::swap(item, parent->items[index]);
-					items.push_back(item);
-					return;
-				}
-			}
-
-			// Merging sibling
-
-			if (index > 0) {
-				Node* left_sibling = parent->children[index - 1];
-				Container* sep = parent->items[index - 1];
-				parent->items.erase(parent->items.begin() + (index - 1));
-				parent->children.erase(parent->children.begin() + (index - 1));
-				items.insert(items.begin(), sep);
-				for (int i = left_sibling->items.size() - 1; i >= 0; i--) {
-					items.insert(items.begin(), left_sibling->items[i]);
-				}
-				delete left_sibling;
-				return;
-			}
-
-			if (index < parent->items.size()) {
-				Node* right_sibling = parent->children[index + 1];
-				Container* sep = parent->items[index];
-				parent->items.erase(parent->items.begin() + index);
-				parent->children.erase(parent->children.begin() + (index + 1));
-				items.push_back(sep);
-				for (int i = 0; i < right_sibling->items.size(); i++) {
-					items.push_back(right_sibling->items[i]);
-				}
-				delete right_sibling;
+		if (index > 0) {
+			auto& left_sibling = parent->children[index - 1];
+			if (left_sibling->items.size() > KEY_MIN) {
+				auto& item = left_sibling->items.back();
+				std::swap(item, parent->items[index]);
+				items.insert(items.begin(), item);
 				return;
 			}
 		}
+
+		if (index + 1 < parent->children.size()) {
+			auto& right_sibling = parent->children[index + 1];
+			if (right_sibling->items.size() > KEY_MIN) {
+				auto& item = right_sibling->items[0];
+				std::swap(item, parent->items[index]);
+				items.push_back(item);
+				return;
+			}
+		}
+
+		// Merging sibling
+
+		if (index > 0) {
+			Node* left_sibling = parent->children[index - 1];
+			Container* sep = parent->items[index - 1];
+			parent->items.erase(parent->items.begin() + (index - 1));
+			parent->children.erase(parent->children.begin() + (index - 1));
+			items.insert(items.begin(), sep);
+			for (int i = left_sibling->items.size() - 1; i >= 0; i--) {
+				items.insert(items.begin(), left_sibling->items[i]);
+			}
+			for (int i = left_sibling->children.size() - 1; i >= 0; i--) {
+				children.push_back(left_sibling->children[i]);
+			}
+			delete left_sibling;
+			return;
+		}
+
+		if (index < parent->items.size()) {
+			Node* right_sibling = parent->children[index + 1];
+			Container* sep = parent->items[index];
+			parent->items.erase(parent->items.begin() + index);
+			parent->children.erase(parent->children.begin() + (index + 1));
+			items.push_back(sep);
+			for (int i = 0; i < right_sibling->items.size(); i++) {
+				items.push_back(right_sibling->items[i]);
+			}
+			for (int i = 0; i < right_sibling->children.size(); i++) {
+				children.push_back(right_sibling->children[i]);
+			}
+			delete right_sibling;
+			return;
+		}
+		
 	}
 
 public:
@@ -153,16 +159,21 @@ public:
 				if (items[i]->count <= 0) {
 					delete items[i];
 					items.erase(items.begin() + i);
-					goto FOUND;
+					balance(parent, index);
 				}
+				return;
 			}
 			else if (data < items[i]->data) {
-				remove(data, this, i);
+				children[i]->remove(data, this, i);
+				balance(parent, index);
+				return;
 			}
 		}
 
-		FOUND:;
-
+		if (children.size() > 0) {
+			children.back()->remove(data, this, items.size());
+			balance(parent, index);
+		}
 	}
 };
 
