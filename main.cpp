@@ -21,6 +21,64 @@ class Node {
 
 	}
 
+	void balance(Node* parent, int index) {
+		if (items.size() >= KEY_MIN) {
+			return;
+		}
+
+		if (children.size() == 0) {
+			// Stealing node from sibling
+
+			if (index > 0) {
+				auto& left_sibling = parent->children[index - 1];
+				if (left_sibling->items.size() > KEY_MIN) {
+					auto& item = left_sibling->items.back();
+					std::swap(item, parent->items[index]);
+					items.insert(items.begin(), item);
+					return;
+				}
+			}
+
+			if (index + 1 < parent->children.size()) {
+				auto& right_sibling = parent->children[index + 1];
+				if (right_sibling->items.size() > KEY_MIN) {
+					auto& item = right_sibling->items[0];
+					std::swap(item, parent->items[index]);
+					items.push_back(item);
+					return;
+				}
+			}
+
+			// Merging sibling
+
+			if (index > 0) {
+				Node* left_sibling = parent->children[index - 1];
+				Container* sep = parent->items[index - 1];
+				parent->items.erase(parent->items.begin() + (index - 1));
+				parent->children.erase(parent->children.begin() + (index - 1));
+				items.insert(items.begin(), sep);
+				for (int i = left_sibling->items.size() - 1; i >= 0; i--) {
+					items.insert(items.begin(), left_sibling->items[i]);
+				}
+				delete left_sibling;
+				return;
+			}
+
+			if (index < parent->items.size()) {
+				Node* right_sibling = parent->children[index + 1];
+				Container* sep = parent->items[index];
+				parent->items.erase(parent->items.begin() + index);
+				parent->children.erase(parent->children.begin() + (index + 1));
+				items.push_back(sep);
+				for (int i = 0; i < right_sibling->items.size(); i++) {
+					items.push_back(right_sibling->items[i]);
+				}
+				delete right_sibling;
+				return;
+			}
+		}
+	}
+
 public:
 	Node() {
 		items.reserve(KEY_MAX+1);
@@ -88,15 +146,23 @@ public:
 		}
 	}
 
-	void remove(Data& data) {
+	void remove(Data& data, Node* parent, int index) {
 		for (int i = 0; i < items.size(); i++) {
 			if (items[i]->data == data) {
 				items[i]->count--;
 				if (items[i]->count <= 0) {
-
+					delete items[i];
+					items.erase(items.begin() + i);
+					goto FOUND;
 				}
 			}
+			else if (data < items[i]->data) {
+				remove(data, this, i);
+			}
 		}
+
+		FOUND:;
+
 	}
 };
 
