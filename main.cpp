@@ -161,7 +161,21 @@ public:
 				items[i]->count--;
 				if (items[i]->count <= 0) {
 					delete items[i];
-					items.erase(items.begin() + i);
+					
+					if (children.size() > 0) {
+						if (children[i + 1]->items.size() > KEY_MIN) {
+							items[i] = children[i + 1]->items[0];
+							children[i + 1]->remove(items[i]->data, this, i);
+						}
+						else {
+							items[i] = children[i]->items.back();
+							children[i]->remove(items[i]->data, this, i);
+						}
+					} 
+					else {
+						items.erase(items.begin() + i);
+					}
+
 					balance(parent, index);
 				}
 				return;
