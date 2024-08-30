@@ -172,7 +172,7 @@ public:
 		}
 	}
 
-	void remove(Data& data, Node* parent=nullptr, int index=0) {
+	Node* remove(Data& data, Node* parent=nullptr, int index=0) {
 		for (int i = 0; i < items.size(); i++) {
 			if (items[i]->data == data) {
 				items[i]->count--;
@@ -180,14 +180,14 @@ public:
 					delete items[i];
 					destroy(i, parent, index);
 				}
-				return;
+				goto FOR_ELSE_END;
 			}
 			else if (data < items[i]->data) {
 				if (i < children.size()) {
 					children[i]->remove(data, this, i);
 					balance(parent, index);
-					return;
 				}
+				goto FOR_ELSE_END;
 			}
 		}
 
@@ -195,6 +195,13 @@ public:
 			children.back()->remove(data, this, items.size());
 			balance(parent, index);
 		}
+
+	FOR_ELSE_END:;
+
+		if (children.size() == 1) {
+			return children[0];
+		}
+		return this;
 	}
 };
 
@@ -208,7 +215,7 @@ public:
 	}
 
 	void remove() {
-		head->remove(data);
+		head = head->remove(data);
 	}
 };
 
