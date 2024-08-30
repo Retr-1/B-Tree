@@ -9,7 +9,7 @@ class Node {
 		Data data;
 		int count = 0;
 
-		Container(Data& data) {
+		Container(const Data& data) {
 			this->data = data;
 		}
 	};
@@ -111,7 +111,7 @@ public:
 		children.reserve(KEY_MAX+2);
 	}
 
-	Node* insert(Data& data, Node* parent=nullptr, int index=0) {
+	Node* insert(const Data& data, Node* parent=nullptr, int index=0) {
 		for (int i = 0; i < items.size(); i++) {
 			if (data == items[i]->data) {
 				items[i]->data++;
@@ -172,7 +172,7 @@ public:
 		}
 	}
 
-	Node* remove(Data& data, Node* parent=nullptr, int index=0) {
+	Node* remove(const Data& data, Node* parent=nullptr, int index=0) {
 		for (int i = 0; i < items.size(); i++) {
 			if (items[i]->data == data) {
 				items[i]->count--;
@@ -210,17 +210,21 @@ template <unsigned KEY_MAX, typename Data>
 class BTree {
 	Node* head = new Node<KEY_MAX, Data>();
 public:
-	void insert(Data& data) {
+	void insert(const Data& data) {
 		head = head->insert(data);
 	}
 
-	void remove() {
+	void remove(const Data& data) {
 		head = head->remove(data);
 	}
 };
 
 
 int main() {
+	BTree<4, int> btree;
+
+	btree.insert(10);
+	btree.insert(10);
 
 	return 0;
 }
