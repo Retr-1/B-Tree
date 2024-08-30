@@ -17,9 +17,9 @@ class Node {
 	std::vector<Container*> items;
 	std::vector<Node*> children;
 
-	void split_node() {
+	//void split_node() {
 
-	}
+	//}
 
 	void destroy(int i, Node* parent, int p_index) {
 		if (i < children.size()) {
@@ -120,11 +120,11 @@ public:
 			else if (data < items[i]->data) {
 				if (children.size() == 0) { // is a leaf node
 					items.insert(items.begin() + i, new Container(data));
-					goto FOR_END;
+					goto FOR_ELSE_END;
 				}
 				else {
 					children[i]->insert(data, this, i);
-					goto FOR_END;
+					goto FOR_ELSE_END;
 				}
 			}
 		}
@@ -136,7 +136,7 @@ public:
 			children[items.size()]->insert(data, this, items.size());
 		}
 
-		FOR_END:;
+		FOR_ELSE_END:;
 
 		if (items.size() <= KEY_MAX) {
 			return this;
@@ -206,7 +206,7 @@ public:
 			balance(parent, index);
 		}
 
-	FOR_ELSE_END:;
+		FOR_ELSE_END:;
 
 		if (children.size() == 1) {
 			return children[0];
@@ -237,6 +237,7 @@ int main() {
 	btree.insert(20);
 	btree.insert(20);
 	btree.insert(30);
+	btree.insert(40);
 	btree.insert(50);
 	btree.insert(60);
 
