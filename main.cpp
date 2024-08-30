@@ -160,11 +160,6 @@ public:
 			children.pop_back();
 		}
 
-		if (children.size() > 0) {
-			right->children.insert(right->children.begin(), children.back());
-			children.pop_back();
-		}
-
 		Container* splitter = items.back();
 		items.pop_back();
 
@@ -240,6 +235,13 @@ int main() {
 	btree.insert(40);
 	btree.insert(50);
 	btree.insert(60);
+	btree.insert(11);
+	btree.insert(12);
+	btree.insert(15);
+	btree.insert(14);
+	for (int i = 100; i < 200; i++) {
+		btree.insert(i);
+	}
 
 	return 0;
 }
