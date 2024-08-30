@@ -141,20 +141,30 @@ public:
 		if (items.size() <= KEY_MAX) {
 			return this;
 		}
+		
+		// Splitting node into 2
 
-		int split_index = items.size() / 2;
 		Node* right = new Node();
-		for (int i = split_index + 1; i < KEY_MAX; i++) {
-			Container* pop_item = items.back();
-			Node* pop_child = children.back();
-			right->items.insert(right->items.begin(), pop_item);
-			right->children.insert(right->children.begin(), pop_child);
 
+		int n = items.size();
+		for (int i = 0; i < n/2; i++) {
+			Container* pop_item = items.back();
+			right->items.insert(right->items.begin(), pop_item);
 			items.pop_back();
+		}
+
+		n = children.size();
+		for (int i = 0; i < n/2; i++) {
+			Node* pop_child = children.back();
+			right->children.insert(right->children.begin(), pop_child);
 			children.pop_back();
 		}
-		right->children.insert(right->children.begin(), children.back());
-		children.pop_back();
+
+		if (children.size() > 0) {
+			right->children.insert(right->children.begin(), children.back());
+			children.pop_back();
+		}
+
 		Container* splitter = items.back();
 		items.pop_back();
 
@@ -208,7 +218,7 @@ public:
 
 template <unsigned KEY_MAX, typename Data>
 class BTree {
-	Node* head = new Node<KEY_MAX, Data>();
+	Node<KEY_MAX,Data>* head = new Node<KEY_MAX, Data>();
 public:
 	void insert(const Data& data) {
 		head = head->insert(data);
@@ -224,7 +234,11 @@ int main() {
 	BTree<4, int> btree;
 
 	btree.insert(10);
-	btree.insert(10);
+	btree.insert(20);
+	btree.insert(20);
+	btree.insert(30);
+	btree.insert(50);
+	btree.insert(60);
 
 	return 0;
 }
