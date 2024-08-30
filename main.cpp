@@ -224,6 +224,7 @@ public:
 	}
 };
 
+// TODO: Put KEY_MIN into template and set KEY_MAX = 2*KEY_MIN, so that KEY_MAX is always even
 
 int main() {
 	BTree<4, int> btree;
@@ -242,6 +243,7 @@ int main() {
 	for (int i = 100; i < 200; i++) {
 		btree.insert(i);
 	}
+	btree.insert(69);
 
 	return 0;
 }
