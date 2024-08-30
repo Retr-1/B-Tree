@@ -21,6 +21,23 @@ class Node {
 
 	}
 
+	void destroy(int i, Node* parent, int p_index) {
+		if (i < children.size()) {
+			if (i+1 < children.size() && children[i + 1]->items.size() > KEY_MIN) {
+				items[i] = children[i + 1]->items[0];
+				children[i + 1]->destroy(0, this, i+1);
+			}
+			else {
+				items[i] = children[i]->items.back();
+				children[i]->destroy(children[i]->items.size() - 1, this, i);
+			}
+		}
+		else {
+			items.erase(items.begin() + i);
+		}
+		balance(parent, p_index);
+	}
+
 	void balance(Node* parent, int index) {
 		if (items.size() >= KEY_MIN) {
 			return;
@@ -161,22 +178,7 @@ public:
 				items[i]->count--;
 				if (items[i]->count <= 0) {
 					delete items[i];
-					
-					if (children.size() > 0) {
-						if (children[i + 1]->items.size() > KEY_MIN) {
-							items[i] = children[i + 1]->items[0];
-							children[i + 1]->remove(items[i]->data, this, i);
-						}
-						else {
-							items[i] = children[i]->items.back();
-							children[i]->remove(items[i]->data, this, i);
-						}
-					} 
-					else {
-						items.erase(items.begin() + i);
-					}
-
-					balance(parent, index);
+					destroy(i, parent, index);
 				}
 				return;
 			}
