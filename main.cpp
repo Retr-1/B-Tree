@@ -1,5 +1,6 @@
 #include <vector>
 #include <tuple>
+#include <iostream>
 
 template <unsigned KEY_MAX, typename Data>
 class Node {
@@ -7,10 +8,11 @@ class Node {
 
 	struct Container {
 		Data data;
-		int count = 0;
+		int count;
 
-		Container(const Data& data) {
+		Container(const Data& data, int count=1) {
 			this->data = data;
+			this->count = count;
 		}
 	};
 
@@ -114,7 +116,7 @@ public:
 	Node* insert(const Data& data, Node* parent=nullptr, int index=0) {
 		for (int i = 0; i < items.size(); i++) {
 			if (data == items[i]->data) {
-				items[i]->data++;
+				items[i]->count++;
 				return this;
 			}
 			else if (data < items[i]->data) {
@@ -208,6 +210,27 @@ public:
 		}
 		return this;
 	}
+
+	int get(const Data& data) {
+		for (int i = 0; i < items.size(); i++) {
+			if (data == items[i]->data) {
+				return items[i]->count;
+			}
+			else if (data < items[i]->data) {
+				if (i >= children.size()) {
+					return 0;
+				}
+				int r = children[i]->get(data);
+				if (r != 0) {
+					return r;
+				}
+			}
+		}
+		if (children.size() == 0) {
+			return 0;
+		}
+		return children[items.size()]->get(data);
+	}
 };
 
 
@@ -221,6 +244,10 @@ public:
 
 	void remove(const Data& data) {
 		head = head->remove(data);
+	}
+
+	int get(const Data& data) {
+		return head->get(data);
 	}
 };
 
@@ -244,6 +271,9 @@ int main() {
 		btree.insert(i);
 	}
 	btree.insert(69);
+	std::cout << btree.get(20);
+	btree.remove(20);
+	std::cout << btree.get(20);
 
 	return 0;
 }
